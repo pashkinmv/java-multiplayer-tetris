@@ -247,7 +247,7 @@ public class TwoPlayerGameController {
             stopPlayer1GameTimer();
             stopPlayer2GameTimer();
             gamePaused = true;
-            tetrisModel.setMessage("Press P to continue");
+            tetrisModel.setMessage("pause");
             repaintDownShifter();
         }
     }

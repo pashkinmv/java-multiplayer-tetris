@@ -49,21 +49,11 @@ public class TwoPlayerKeyListener extends KeyAdapter {
         if (!gameController.gameStarted()) {
             return;
         }
-        
-        if (e.getKeyCode() == KeyEvent.VK_P) {
-            if (gameController.gamePaused()) {
-                gameController.resumeGame();
-            } else {
-                gameController.pauseGame();
-            }
-            
-            return;
-        }
-        
+
         if (gameController.gamePaused()) {
-            return;
+            gameController.resumeGame();
         }
-        
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
                 if (!player2LeftPressed) {
@@ -124,6 +114,9 @@ public class TwoPlayerKeyListener extends KeyAdapter {
                 break;
             case KeyEvent.VK_W:
                 gameController.player1TurnCounterClockwise();
+                break;
+            case KeyEvent.VK_P:
+                gameController.pauseGame();
                 break;
         }
     }

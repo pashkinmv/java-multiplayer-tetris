@@ -47,18 +47,8 @@ public class OnePlayerKeyListener extends KeyAdapter {
             return;
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_P) {
-            if (gameController.gamePaused()) {
-                gameController.resumeGame();
-            } else {
-                gameController.pauseGame();
-            }
-
-            return;
-        }
-
         if (gameController.gamePaused()) {
-            return;
+            gameController.resumeGame();
         }
 
         switch (e.getKeyCode()) {
@@ -91,6 +81,9 @@ public class OnePlayerKeyListener extends KeyAdapter {
                 break;
             case KeyEvent.VK_UP:
                 gameController.player1TurnCounterClockwise();
+                break;
+            case KeyEvent.VK_P:
+                gameController.pauseGame();
                 break;
         }
     }

@@ -266,14 +266,14 @@ public class MultiplayerGameController implements GameController {
                     stopPlayer2GameTimer();
                     pauseGameCommand.sendCommand();
                     gamePaused = true;
-                    tetrisModel.setMessage("Press P to continue");
+                    tetrisModel.setMessage("pause");
                     repaintDownShifter();
                 } catch (IOException ex) {
                     interraptGame(ex);
                 }
             } else {
                 gamePaused = true;
-                tetrisModel.setMessage("Press P to continue");
+                tetrisModel.setMessage("pause");
             }
         }
     }

@@ -175,7 +175,7 @@ public class OnePlayerGameController implements GameController {
         if (gameStarted && !gamePaused) {
             stopGameTimer();
             gamePaused = true;
-            tetrisModel.setMessage("Press P to continue");
+            tetrisModel.setMessage("pause");
             repaintDownShifter();
         }
     }
