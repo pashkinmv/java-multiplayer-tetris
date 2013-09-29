@@ -1,6 +1,13 @@
-java-multiplayer-tetris
-=======================
+## Java Multiplayer Tetris
+Play tetris alone, together on the same tetris sheet or through the network... enjoy!
+The project homesite is [Homesite][here]
 
-Play tetris alone, together on the same tetris sheet or using network... enjoy!
+## Contributing
+[Pull requests][] are welcome.
 
-There are some bugs... I'll fix if anyone really needs.
+## License
+The project is released under [MIT License][].
+
+[Homesite]: https://sites.google.com/site/multiplayertetris/
+[Pull requests]: http://help.github.com/send-pull-requests
+[MIT License]: http://opensource.org/licenses/MIT
