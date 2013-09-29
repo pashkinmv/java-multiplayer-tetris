@@ -161,7 +161,7 @@ public class MainFrame extends JFrame implements TerminalController {
 
         if (gameTerminal == null) {
             try {
-                final String serverAddress = JOptionPane.showInternalInputDialog(getContentPane(), "Input server address");
+                final String serverAddress = JOptionPane.showInternalInputDialog(getContentPane(), "Input server ip address or PC network name");
                 if (serverAddress == null || serverAddress.trim().isEmpty()) {
                     return;
                 }
