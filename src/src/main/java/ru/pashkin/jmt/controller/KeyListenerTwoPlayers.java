@@ -28,10 +28,10 @@ import java.awt.event.KeyEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TwoPlayerKeyListener extends KeyAdapter {
+public class KeyListenerTwoPlayers extends KeyAdapter {
     
     private int keyRepeatDelay = 100;
-    private TwoPlayerGameController gameController;
+    private GameControllerTwoPlayers gameController;
     private boolean player1LeftPressed;
     private boolean player1RightPressed;
     private boolean player1SpacePressed;
@@ -40,7 +40,7 @@ public class TwoPlayerKeyListener extends KeyAdapter {
     private boolean player2SpacePressed;
     private Timer repeatKeyTimer;
     
-    public TwoPlayerKeyListener(TwoPlayerGameController gameController) {
+    public KeyListenerTwoPlayers(GameControllerTwoPlayers gameController) {
         this.gameController = gameController;
     }
 

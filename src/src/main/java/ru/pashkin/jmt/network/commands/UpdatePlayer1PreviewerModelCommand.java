@@ -21,33 +21,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class BlinkCommand extends AbstractCommand {
-
-    private MultiplayerGameController multiplayerGameController;
+public class UpdatePlayer1PreviewerModelCommand extends AbstractCommand {
     
-    public BlinkCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "doBlink";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public UpdatePlayer1PreviewerModelCommand(NetworkManager networkManager) {
+        super(UpdatePlayer1PreviewerModelCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
-        if (!"do".equals(inputLine)) {
-            return;
-        }
-        
-        multiplayerGameController.blink();
+    protected void receiveData(String inputLine) {
+        networkManager.getGameController().getBoard().getPlayer1PreviewerModel().fromString(inputLine);
+        networkManager.getGameController().repaintPlayer1Previewer();
     }
 
     @Override
-    protected String composeCommand() {
-        return "do";
+    protected String sendData() {
+        return networkManager.getGameController().getBoard().getPlayer1PreviewerModel().toString();
     }
-    
 }

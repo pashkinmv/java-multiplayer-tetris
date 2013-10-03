@@ -23,25 +23,52 @@
 
 package ru.pashkin.jmt.controller;
 
+import ru.pashkin.jmt.view.BoardTwoPlayers;
+
 public interface GameController {
 
-    public void player1PushLeft();
+    void player1PushLeft();
 
-    public void player1PushRight();
+    void player1PushRight();
 
-    public void player1TurnClockwise();
+    void player1TurnClockwise();
 
-    public void player1TurnCounterClockwise();
+    void player1TurnCounterClockwise();
 
-    public void player1PushDown();
+    void player1PushDown();
 
-    public boolean gameStarted();
+    void player2PushLeft();
 
-    public boolean gamePaused();
+    void player2PushRight();
 
-    public void startGame();
+    void player2TurnClockwise();
 
-    public void pauseGame();
+    void player2TurnCounterClockwise();
 
-    public void resumeGame();
+    void player2PushDown();
+
+    boolean gameStarted();
+
+    boolean gamePaused();
+
+    void startGame();
+
+    void pauseGame();
+
+    void resumeGame();
+
+    void repaintDownShifter();
+
+    void repaintPlayer1Previewer();
+
+    void repaintPlayer2Previewer();
+
+    void doShift();
+
+    void blink();
+
+    void gameOver();
+
+    BoardTwoPlayers getBoard();
+
 }

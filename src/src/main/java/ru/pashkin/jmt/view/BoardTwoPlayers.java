@@ -23,83 +23,27 @@
 
 package ru.pashkin.jmt.view;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyListener;
-import javax.swing.Box;
-import javax.swing.JPanel;
-import ru.pashkin.jmt.TerminalController;
-import ru.pashkin.jmt.controller.MultiplayerGameController;
-import ru.pashkin.jmt.controller.OnePlayerKeyListener;
 import ru.pashkin.jmt.model.TetrisModel;
-import ru.pashkin.jmt.network.NetworkManager;
 import ru.pashkin.jmt.view.components.DownShifter;
 import ru.pashkin.jmt.view.components.TetrisView;
 
-public class MultiplayerGameTerminal extends GameTerminal {
+import javax.swing.*;
+import java.awt.*;
 
-    private TetrisModel tetrisModel = new TetrisModel(20, 18, true);
+public class BoardTwoPlayers extends JPanel {
+
+    private TetrisModel tetrisModel = new TetrisModel(20, 18);
     private TetrisView tetrisView = new TetrisView(tetrisModel);
     private DownShifter downShifter = new DownShifter(tetrisView);
-    private TetrisModel player1PreviewerModel = new TetrisModel(10, 4, false);
-    private TetrisModel player2PreviewerModel = new TetrisModel(10, 4, false);
+    private TetrisModel player1PreviewerModel = new TetrisModel(10, 4);
+    private TetrisModel player2PreviewerModel = new TetrisModel(10, 4);
     private TetrisView player1PreviewerView = new TetrisView(player1PreviewerModel);
     private TetrisView player2PreviewerView = new TetrisView(player2PreviewerModel);
     private final ScoresViewer player1ScoresViewer = new ScoresViewer();
     private final ScoresViewer player2ScoresViewer = new ScoresViewer();
-    private MultiplayerGameController gameController = new MultiplayerGameController();
-    private NetworkManager networkManager;
-    private final KeyListener keyListener = new OnePlayerKeyListener(gameController);
-    private final FocusAdapter focusListener = new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-            gameController.pauseGame();
-        }
-    };
 
-    @Override
-    public KeyListener getKeyListener() {
-        return keyListener;
-    }
-
-    @Override
-    public FocusListener getFocusListener() {
-        return focusListener;
-    }
-
-    public MultiplayerGameTerminal(NetworkManager networkManager, TerminalController terminalController) {
-        this.networkManager = networkManager;
-
-        gameController.setTetrisView(tetrisView);
-        gameController.setTetrisModel(tetrisModel);
-        gameController.setDownShifter(downShifter);
-        gameController.setPlayer1PreviewerView(player1PreviewerView);
-        gameController.setPlayer1PreviewerModel(player1PreviewerModel);
-        gameController.setPlayer1ScoresViewer(player1ScoresViewer);
-        gameController.setPlayer2PreviewerView(player2PreviewerView);
-        gameController.setPlayer2PreviewerModel(player2PreviewerModel);
-        gameController.setPlayer2ScoresViewer(player2ScoresViewer);
-        gameController.setNetworkManager(networkManager);
-        gameController.setTerminalController(terminalController);
-
+    public BoardTwoPlayers() {
         initGui();
-    }
-
-    @Override
-    public void startGame() {
-        if (networkManager.isServer()) {
-            gameController.startGame();
-        }
-    }
-
-    @Override
-    public void destroyTerminal() {
-        gameController.stopPlayer1GameTimer();
-        gameController.stopPlayer2GameTimer();
     }
 
     private void initGui() {
@@ -145,4 +89,43 @@ public class MultiplayerGameTerminal extends GameTerminal {
         return wrapperPanel;
     }
 
+    public TetrisModel getTetrisModel() {
+        return tetrisModel;
+    }
+
+    public TetrisModel getPlayer1PreviewerModel() {
+        return player1PreviewerModel;
+    }
+
+    public DownShifter getDownShifter() {
+        return downShifter;
+    }
+
+    public ScoresViewer getPlayer1ScoresViewer() {
+        return player1ScoresViewer;
+    }
+
+    public ScoresViewer getPlayer2ScoresViewer() {
+        return player2ScoresViewer;
+    }
+
+    public TetrisModel getPlayer2PreviewerModel() {
+        return player2PreviewerModel;
+    }
+
+    public TetrisView getPlayer1PreviewerView() {
+        return player1PreviewerView;
+    }
+
+    public TetrisView getPlayer2PreviewerView() {
+        return player2PreviewerView;
+    }
+
+    public TetrisView getTetrisView() {
+        return tetrisView;
+    }
+
+    public void showMessage(String message) {
+        System.out.println(message);
+    }
 }

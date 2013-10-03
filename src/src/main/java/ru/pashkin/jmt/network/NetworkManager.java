@@ -23,62 +23,70 @@
 
 package ru.pashkin.jmt.network;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.LinkedHashSet;
-import javax.net.ServerSocketFactory;
+import ru.pashkin.jmt.controller.GameController;
+import ru.pashkin.jmt.network.commands.*;
 
+import java.io.*;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Starts communication with server or client.
+ * Sends commands.
+ */
 public class NetworkManager {
-    private static final int DEFAULT_PORT = 10001;
-    private final LinkedHashSet<AbstractCommand> commandList = new LinkedHashSet<>();
+    private Map<Class, AbstractCommand> commandMap = new HashMap<>();
+
     private Socket socket;
     private CommandSender commandSender;
-    private boolean isServer;
-    private ServerSocket serverSocket = null;
-    
-    public boolean isServer() {
-        return isServer;
+    private GameController gameController;
+
+    public NetworkManager(GameController gameController) {
+        this.gameController = gameController;
+        addCommands();
     }
-    
-    public void addCommand(AbstractCommand command) {
-        commandList.add(command);
-        command.setCommandSender(commandSender);
+
+    public GameController getGameController() {
+        return gameController;
     }
-    
-    public void runAsServer() throws IOException {
-        isServer = true;
-        socket = waitForConnection();
-        runCommunication();
-    }
-    
-    public void connectToClient(String host) throws IOException {
-        isServer = false;
-        socket = connectTo(host);
-        runCommunication();
-    }
-    
-    public synchronized void closeServerSocket() {
-        if (serverSocket != null) {
-            try {
-                serverSocket.close();
-            } catch (IOException ex) {
-                // DO NOTHING
-            } finally {
-                serverSocket = null;
-            }
+
+    public void sendString(String string) {
+        try {
+            commandSender.send(string);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     
-    private void runCommunication() throws IOException {
-        if (socket == null) {
-            return;
+    public void sendCommand(Class commandClass) throws IOException {
+        final AbstractCommand command = commandMap.get(commandClass);
+        if (command != null) {
+            command.sendCommand();
         }
+    }
+
+    private void addCommands() {
+        commandMap.put(PauseGameCommand.class, new PauseGameCommand(this));
+        commandMap.put(PushLeftCommand.class, new PushLeftCommand(this));
+        commandMap.put(PushRightCommand.class, new PushRightCommand(this));
+        commandMap.put(PushDownCommand.class, new PushDownCommand(this));
+        commandMap.put(TurnClockwiseCommand.class, new TurnClockwiseCommand(this));
+        commandMap.put(TurnCounterClockwiseCommand.class, new TurnCounterClockwiseCommand(this));
+        commandMap.put(UpdateTetrisModelCommand.class, new UpdateTetrisModelCommand(this));
+        commandMap.put(UpdatePlayer1PreviewerModelCommand.class, new UpdatePlayer1PreviewerModelCommand(this));
+        commandMap.put(UpdatePlayer2PreviewerModelCommand.class, new UpdatePlayer2PreviewerModelCommand(this));
+        commandMap.put(ResumeGameCommand.class, new ResumeGameCommand(this));
+        commandMap.put(DoShiftCommand.class, new DoShiftCommand(this));
+        commandMap.put(BlinkCommand.class, new BlinkCommand(this));
+        commandMap.put(UpdateScoresCommand.class, new UpdateScoresCommand(this));
+        commandMap.put(GameOverCommand.class, new GameOverCommand(this));
+    }
+    
+    public void startCommunication(Socket socket) throws IOException {
+        stopCommunication();
+
+        this.socket = socket;
         
         final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         commandSender = new CommandSender(){
@@ -90,20 +98,21 @@ public class NetworkManager {
                 writer.flush();
             }
         };
-        for (AbstractCommand command : commandList) {
-            command.setCommandSender(commandSender);
-        }
-        
+
         new Thread(new Runnable(){
 
             @Override
             public void run() {
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(NetworkManager.this.socket.getInputStream()));
                     String string;
                     while ((string = reader.readLine()) != null) {
                         if (string.trim().length() > 0) {
-                            processCommand(string);
+                            for (AbstractCommand command : commandMap.values()) {
+                                if (command.execute(string)) {
+                                    break;
+                                }
+                            }
                         }
                     }
                 } catch (IOException ex) {
@@ -112,30 +121,21 @@ public class NetworkManager {
             }
         }).start();
     }
-    
-    private void processCommand(String string) {
-        for (AbstractCommand command : commandList) {
-            if (command.execute(string)) {
-                break;
+
+    public void stopCommunication() {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            socket = null;
         }
     }
     
-    private Socket waitForConnection() {
-        try {
-            serverSocket = ServerSocketFactory.getDefault().createServerSocket(DEFAULT_PORT);
-            return serverSocket.accept();
-        } catch (IOException e) {
-            System.err.println("Server socket closed");
-        } finally {
-            closeServerSocket();
-        }
-        
-        return null;
-    }
-    
-    private Socket connectTo(String address) throws IOException {
-        return new Socket(address, DEFAULT_PORT);
+    private interface CommandSender {
+
+        public void send(String command) throws IOException;
     }
     
 }

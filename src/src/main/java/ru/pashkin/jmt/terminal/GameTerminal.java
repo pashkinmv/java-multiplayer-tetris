@@ -21,33 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.terminal;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
-import ru.pashkin.jmt.network.AbstractCommand;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyListener;
+import javax.swing.JPanel;
 
-public class ResumeGameCommand extends AbstractCommand {
+public interface GameTerminal {
 
-    private MultiplayerGameController multiplayerGameController;
-    
-    public ResumeGameCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "resumeGame";
-        
-        this.multiplayerGameController = multiplayerGameController;
-    }
+    void startGame();
 
-    @Override
-    protected void process(String inputLine) {
-        if (!"do".equals(inputLine)) {
-            return;
-        }
-        
-        multiplayerGameController.resumeGame();
-    }
+    void destroyTerminal();
 
-    @Override
-    protected String composeCommand() {
-        return "do";
-    }
-    
+    JPanel getBoard();
+
+    KeyListener getKeyListener();
+
+    FocusListener getFocusListener();
 }

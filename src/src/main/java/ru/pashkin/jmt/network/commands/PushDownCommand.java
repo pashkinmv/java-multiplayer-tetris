@@ -21,9 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt;
+package ru.pashkin.jmt.network.commands;
 
-public interface TerminalController {
-    public void showMessage(String message);
-    public void showGameTerminal();
+import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
+
+public class PushDownCommand extends AbstractCommand {
+
+    public PushDownCommand(NetworkManager networkManager) {
+        super(PushDownCommand.class.getName(), networkManager);
+    }
+
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
+        
+        networkManager.getGameController().player2PushDown();
+    }
+
+    @Override
+    protected String sendData() {
+        return "do";
+    }
+    
 }

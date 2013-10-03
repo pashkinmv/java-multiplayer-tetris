@@ -28,12 +28,16 @@ import java.io.IOException;
 public abstract class AbstractCommand {
 
     protected String commandName;
-    private CommandSender commandSender;
-    
-    public void setCommandSender(CommandSender commandSender) {
-        this.commandSender = commandSender;
+    protected NetworkManager networkManager;
+
+    public AbstractCommand(String commandName, NetworkManager networkManager) {
+        this.networkManager = networkManager;
+        this.commandName = commandName;
     }
-    
+
+    /**
+     * @return true if command is processed
+     */
     public boolean execute(String inputLine) {
         if (commandName == null || commandName.trim().isEmpty()
                 || inputLine == null || inputLine.trim().isEmpty()) {
@@ -41,16 +45,16 @@ public abstract class AbstractCommand {
         }
         
         if (inputLine.startsWith(commandName + ": ")) {
-            process(inputLine.substring((commandName + ": ").length()));
+            receiveData(inputLine.substring((commandName + ": ").length()));
         }
         
         return false;
     }
     
     public void sendCommand() throws IOException {
-        commandSender.send(commandName + ": " + composeCommand());
+        networkManager.sendString(commandName + ": " + sendData());
     }
     
-    protected abstract void process(String inputLine);
-    protected abstract String composeCommand();
+    protected abstract void receiveData(String inputLine);
+    protected abstract String sendData();
 }

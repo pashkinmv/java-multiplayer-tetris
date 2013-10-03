@@ -21,32 +21,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class TurnClockwiseCommand extends AbstractCommand {
-
-    private MultiplayerGameController multiplayerGameController;
+public class UpdateTetrisModelCommand extends AbstractCommand {
     
-    public TurnClockwiseCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "turnClockwise";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public UpdateTetrisModelCommand(NetworkManager networkManager) {
+        super(UpdateTetrisModelCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
-        if (!"do".equals(inputLine)) {
-            return;
-        }
-        
-        multiplayerGameController.player2TurnClockwise();
+    protected void receiveData(String inputLine) {
+        networkManager.getGameController().getBoard().getTetrisModel().fromString(inputLine);
+        networkManager.getGameController().repaintDownShifter();
     }
 
     @Override
-    protected String composeCommand() {
-        return "do";
+    protected String sendData() {
+        return networkManager.getGameController().getBoard().getTetrisModel().toString();
     }
 }

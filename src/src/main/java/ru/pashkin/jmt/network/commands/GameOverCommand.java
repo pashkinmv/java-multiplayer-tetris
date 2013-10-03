@@ -21,32 +21,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class PushDownCommand extends AbstractCommand {
+public class GameOverCommand extends AbstractCommand {
 
-    private MultiplayerGameController multiplayerGameController;
-    
-    public PushDownCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "pushDown";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public GameOverCommand(NetworkManager networkManager) {
+        super(GameOverCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
+    protected void receiveData(String inputLine) {
         if (!"do".equals(inputLine)) {
             return;
         }
         
-        multiplayerGameController.player2PushDown();
+        networkManager.getGameController().gameOver();
     }
 
     @Override
-    protected String composeCommand() {
+    protected String sendData() {
         return "do";
     }
     

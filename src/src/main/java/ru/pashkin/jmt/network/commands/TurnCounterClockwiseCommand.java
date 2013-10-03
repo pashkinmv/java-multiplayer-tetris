@@ -21,19 +21,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.view;
+package ru.pashkin.jmt.network.commands;
 
-import java.awt.event.FocusListener;
-import java.awt.event.KeyListener;
-import javax.swing.JPanel;
+import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public abstract class GameTerminal extends JPanel {
+public class TurnCounterClockwiseCommand extends AbstractCommand {
 
-    public abstract void startGame();
+    public TurnCounterClockwiseCommand(NetworkManager networkManager) {
+        super(TurnCounterClockwiseCommand.class.getName(), networkManager);
+    }
 
-    public abstract void destroyTerminal();
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
+        
+        networkManager.getGameController().player2TurnCounterClockwise();
+    }
 
-    public abstract KeyListener getKeyListener();
-
-    public abstract FocusListener getFocusListener();
+    @Override
+    protected String sendData() {
+        return "do";
+    }
 }

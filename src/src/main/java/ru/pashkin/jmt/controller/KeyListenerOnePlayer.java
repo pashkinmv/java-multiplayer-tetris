@@ -28,7 +28,7 @@ import java.awt.event.KeyEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class OnePlayerKeyListener extends KeyAdapter {
+public class KeyListenerOnePlayer extends KeyAdapter {
 
     private int keyRepeatDelay = 100;
     private GameController gameController;
@@ -37,7 +37,7 @@ public class OnePlayerKeyListener extends KeyAdapter {
     private boolean spacePressed;
     private Timer repeatKeyTimer;
 
-    public OnePlayerKeyListener(GameController gameController) {
+    public KeyListenerOnePlayer(GameController gameController) {
         this.gameController = gameController;
     }
 

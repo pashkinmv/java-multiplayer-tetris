@@ -21,14 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.utils;
+package ru.pashkin.jmt.network.commands;
 
-public class StringUtils {
-    
-    private StringUtils() {}
-    
-    public static boolean isEmpty(String string) {
-        return string == null || string.trim().isEmpty();
+import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
+
+public class BlinkCommand extends AbstractCommand {
+
+    public BlinkCommand(NetworkManager networkManager) {
+        super(BlinkCommand.class.getName(), networkManager);
+    }
+
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
+        
+        networkManager.getGameController().blink();
+    }
+
+    @Override
+    protected String sendData() {
+        return "do";
     }
     
 }

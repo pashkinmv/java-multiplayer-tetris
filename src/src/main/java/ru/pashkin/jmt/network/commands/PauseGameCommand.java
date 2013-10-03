@@ -21,32 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class TurnCounterClockwiseCommand extends AbstractCommand {
-
-    private MultiplayerGameController multiplayerGameController;
+public class PauseGameCommand extends AbstractCommand {
     
-    public TurnCounterClockwiseCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "turnCounterClockwise";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public PauseGameCommand(NetworkManager networkManager) {
+        super(PauseGameCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
+    protected void receiveData(String inputLine) {
         if (!"do".equals(inputLine)) {
             return;
         }
         
-        multiplayerGameController.player2TurnCounterClockwise();
+        networkManager.getGameController().pauseGame();
     }
 
     @Override
-    protected String composeCommand() {
+    protected String sendData() {
         return "do";
     }
+    
 }

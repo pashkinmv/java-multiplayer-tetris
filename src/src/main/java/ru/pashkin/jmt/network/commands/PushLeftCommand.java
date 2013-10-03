@@ -21,11 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.network;
+package ru.pashkin.jmt.network.commands;
 
-import java.io.IOException;
+import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public interface CommandSender {
+public class PushLeftCommand extends AbstractCommand {
+    
+    public PushLeftCommand(NetworkManager networkManager) {
+        super(PushLeftCommand.class.getName(), networkManager);
+    }
 
-    public void send(String command) throws IOException;
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
+        
+        networkManager.getGameController().player2PushLeft();
+    }
+
+    @Override
+    protected String sendData() {
+        return "do";
+    }
+    
 }

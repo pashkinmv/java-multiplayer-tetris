@@ -21,29 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class UpdateTetrisModelCommand extends AbstractCommand {
-    
-    private MultiplayerGameController multiplayerGameController;
-    
-    public UpdateTetrisModelCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "updateTetrisModel";
+public class DoShiftCommand extends AbstractCommand {
+
+    public DoShiftCommand(NetworkManager networkManager) {
+        super(DoShiftCommand.class.getName(), networkManager);
+    }
+
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
         
-        this.multiplayerGameController = multiplayerGameController;
+        networkManager.getGameController().doShift();
     }
 
     @Override
-    protected void process(String inputLine) {
-        multiplayerGameController.getTetrisModel().fromString(inputLine);
-        multiplayerGameController.repaintDownShifter();
+    protected String sendData() {
+        return "do";
     }
-
-    @Override
-    protected String composeCommand() {
-        return multiplayerGameController.getTetrisModel().toString();
-    }
+    
 }

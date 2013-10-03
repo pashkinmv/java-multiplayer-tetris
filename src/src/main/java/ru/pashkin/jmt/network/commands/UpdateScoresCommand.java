@@ -21,26 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
-import ru.pashkin.jmt.utils.StringUtils;
+import ru.pashkin.jmt.network.NetworkManager;
 import ru.pashkin.jmt.view.ScoresViewer;
 
 public class UpdateScoresCommand extends AbstractCommand {
     
-    private MultiplayerGameController multiplayerGameController;
-    
-    public UpdateScoresCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "updateScores";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public UpdateScoresCommand(NetworkManager networkManager) {
+        super(UpdateScoresCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
-        if (StringUtils.isEmpty(inputLine)) {
+    protected void receiveData(String inputLine) {
+        if (inputLine == null || inputLine.trim().isEmpty()) {
             return;
         }
         
@@ -53,20 +48,20 @@ public class UpdateScoresCommand extends AbstractCommand {
         final String level = splittedLine[1];
         final String nextLevel = splittedLine[2];
         
-        final ScoresViewer scoresViewer1 = multiplayerGameController.getPlayer1ScoresViewer();
+        final ScoresViewer scoresViewer1 = networkManager.getGameController().getBoard().getPlayer1ScoresViewer();
         scoresViewer1.setScores(scores);
         scoresViewer1.setLevel(level);
         scoresViewer1.setNextLevel(nextLevel);
         
-        final ScoresViewer scoresViewer2 = multiplayerGameController.getPlayer2ScoresViewer();
+        final ScoresViewer scoresViewer2 = networkManager.getGameController().getBoard().getPlayer2ScoresViewer();
         scoresViewer2.setScores(scores);
         scoresViewer2.setLevel(level);
         scoresViewer2.setNextLevel(nextLevel);
     }
 
     @Override
-    protected String composeCommand() {
-        final ScoresViewer scoresViewer = multiplayerGameController.getPlayer1ScoresViewer();
+    protected String sendData() {
+        final ScoresViewer scoresViewer = networkManager.getGameController().getBoard().getPlayer1ScoresViewer();
         
         final String scores = scoresViewer.getScores();
         final String level = scoresViewer.getLevel();

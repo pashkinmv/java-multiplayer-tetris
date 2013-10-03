@@ -54,15 +54,17 @@ public class ScoresViewer extends JPanel {
         add(nextLevelLabel);
         add(nextLevel);
     }
+
+    public void update(String scores, String nextLevelScores, String level) {
+        this.scores.setText(scores);
+        this.nextLevel.setText(nextLevelScores);
+        this.level.setText(level);
+    }
     
     public String getScores() {
         return scores.getText();
     }
-    
-    public void setScores(int newScores) {
-        setScores(String.valueOf(newScores));
-    }
-    
+
     public void setScores(String newScores) {
         scores.setText(newScores);
     }
@@ -70,11 +72,7 @@ public class ScoresViewer extends JPanel {
     public String getLevel() {
         return level.getText();
     }
-    
-    public void setLevel(int newLevel) {
-        setLevel(String.valueOf(newLevel));
-    }
-    
+
     public void setLevel(String newLevel) {
         level.setText(newLevel);
     }
@@ -82,11 +80,7 @@ public class ScoresViewer extends JPanel {
     public String getNextLevel() {
         return nextLevel.getText();
     }
-    
-    public void setNextLevel(int newNextLevel) {
-        setNextLevel(String.valueOf(newNextLevel));
-    }
-    
+
     public void setNextLevel(String newNextLevel) {
         nextLevel.setText(newNextLevel);
     }

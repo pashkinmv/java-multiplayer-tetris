@@ -23,32 +23,22 @@
 
 package ru.pashkin.jmt;
 
+import ru.pashkin.jmt.terminal.*;
+import ru.pashkin.jmt.view.components.ChangeLookAndFeelMenu;
+import ru.pashkin.jmt.view.components.ExitMenu;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyListener;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import javax.swing.*;
-import ru.pashkin.jmt.network.NetworkManager;
-import ru.pashkin.jmt.view.GameTerminal;
-import ru.pashkin.jmt.view.MultiplayerGameTerminal;
-import ru.pashkin.jmt.view.OnePlayerGameTerminal;
-import ru.pashkin.jmt.view.TwoPlayerGameTerminal;
-import ru.pashkin.jmt.view.components.ChangeLookAndFeelMenu;
-import ru.pashkin.jmt.view.components.ExitMenu;
-import ru.pashkin.jmt.view.components.InfoPanel;
 
-public class MainFrame extends JFrame implements TerminalController {
+public class MainFrame extends JFrame {
 
+    private GameTerminal currentGameTerminal;
     private CardLayout layout = new CardLayout();
-    private InfoPanel panelInfo = new InfoPanel();
     private JPanel panelGame = new JPanel();
     private JPanel panelMenu = new JPanel();
-    private NetworkManager serverNetworkManager;
     private JMenuItem restartCurrentGameMenu = new JMenuItem("Start new game");
-    private static final String PANEL_INFO = "info";
     private static final String PANEL_GAME = "game";
     private static final String PANEL_MENU = "menu";
 
@@ -62,7 +52,6 @@ public class MainFrame extends JFrame implements TerminalController {
         setLayout(layout);
 
         add(panelMenu, PANEL_MENU);
-        add(panelInfo, PANEL_INFO);
         add(panelGame, PANEL_GAME);
 
         initPanelMenu();
@@ -81,167 +70,87 @@ public class MainFrame extends JFrame implements TerminalController {
      * Starts one player game
      */
     private void startOnePlayerGame() {
-        GameTerminal gameTerminal = getCurrentGameTerminal(OnePlayerGameTerminal.class);
-
-        if (gameTerminal == null) {
-            gameTerminal = new OnePlayerGameTerminal();
-            setGameTerminal(gameTerminal);
-        }
-
+        installGameTerminal(GameTerminalOnePlayer.class);
         showGameTerminal();
-        gameTerminal.startGame();
+        currentGameTerminal.startGame();
     }
 
     /**
      * Starts two player game
      */
     private void startTwoPlayerGame() {
-        GameTerminal gameTerminal = getCurrentGameTerminal(TwoPlayerGameTerminal.class);
-
-        if (gameTerminal == null) {
-            gameTerminal = new TwoPlayerGameTerminal();
-            setGameTerminal(gameTerminal);
-        }
-
+        installGameTerminal(GameTerminalTwoPlayers.class);
         showGameTerminal();
-        gameTerminal.startGame();
+        currentGameTerminal.startGame();
     }
 
     /**
      * Starts game as network server
      */
     private void startNetworkGame() {
-        GameTerminal gameTerminal = getCurrentGameTerminal(MultiplayerGameTerminal.class);
-
-        /*
-         * Wait for connection until game start
-         */
-        if (gameTerminal == null) {
-            showMessage("Wait for the second player connection");
-
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        serverNetworkManager = new NetworkManager();
-                        serverNetworkManager.runAsServer();
-                        /*
-                         * Network game may be interrapted by another game starting
-                         */
-                        if (serverNetworkManager == null) {
-                            return;
-                        }
-
-                        final GameTerminal newGameTerminal = new MultiplayerGameTerminal(serverNetworkManager, MainFrame.this);
-                        setGameTerminal(newGameTerminal);
-
-                        showGameTerminal();
-                        newGameTerminal.startGame();
-                    } catch (IOException ex) {
-                        showMessage("Connection error: " + ex.getMessage());
-                    } finally {
-                        serverNetworkManager = null;
-                    }
-                }
-            }).start();
-        } else {
-            /*
-             * Start game
-             */
-            gameTerminal.startGame();
-        }
+        installGameTerminal(GameTerminalServer.class);
+        // TODO implement
+//        showMessage("Wait for the second player connection");
+        ((GameTerminalServer) currentGameTerminal).waitForConnection();
+        showGameTerminal();
+        currentGameTerminal.startGame();
     }
 
     /**
      * Starts the game as network client
      */
     private void connectToNetworkGame() {
-        GameTerminal gameTerminal = getCurrentGameTerminal(MultiplayerGameTerminal.class);
+        installGameTerminal(GameTerminalClient.class);
 
-        if (gameTerminal == null) {
-            try {
-                final String serverAddress = JOptionPane.showInternalInputDialog(getContentPane(), "Input server ip address or PC network name");
-                if (serverAddress == null || serverAddress.trim().isEmpty()) {
-                    return;
-                }
-                final NetworkManager networkManager = new NetworkManager();
-                networkManager.connectToClient(serverAddress);
-
-                gameTerminal = new MultiplayerGameTerminal(networkManager, this);
-                setGameTerminal(gameTerminal);
-
-                showGameTerminal();
-            } catch (UnknownHostException e) {
-                showMessage("Remote computer not found");
-            } catch (IOException ex) {
-                showMessage("Remote computer has not started game");
-            }
-        } else {
-            gameTerminal.startGame();
+        final String serverAddress = JOptionPane.showInternalInputDialog(getContentPane(), "Input server ip address or PC network name");
+        if (serverAddress == null || serverAddress.trim().isEmpty()) {
+            return;
         }
+
+        // TODO implement
+//        showMessage("Wait for the second player connection");
+        ((GameTerminalClient) currentGameTerminal).connectToServer(serverAddress);
+        showGameTerminal();
+        currentGameTerminal.startGame();
+
     }
 
     /**
-     * Get current game terminal and desproy another
+     * Get current game terminal and destroy previous one if necessary
      */
-    private GameTerminal getCurrentGameTerminal(Class terminalClass) {
-        /*
-         * Close awiting network server if necessary
-         */
-        if (serverNetworkManager != null) {
-            serverNetworkManager.closeServerSocket();
-            serverNetworkManager = null;
+    private <T extends GameTerminal> void installGameTerminal(Class<T> clazz) {
+        if (currentGameTerminal != null && clazz.getClass().isInstance(currentGameTerminal)) {
+            return;
         }
 
-        GameTerminal gameTerminal = null;
+        destroyCurrentGameTerminal();
 
-        final Component[] components = panelGame.getComponents();
-        if (components.length > 0) {
-            if (terminalClass.isInstance(components[0])) {
-                gameTerminal = (GameTerminal) components[0];
-            } else {
-                restartCurrentGameMenu.setEnabled(false);
-                ((GameTerminal) components[0]).destroyTerminal();
-            }
+        try {
+            currentGameTerminal = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        return gameTerminal;
+        initCurrentGameTerminal();
     }
 
-    private void restartCurrentGame() {
-        final Component[] components = panelGame.getComponents();
-        if (components.length > 0) {
-            if (components[0] instanceof GameTerminal) {
-                ((GameTerminal) components[0]).startGame();
-            }
+    private void destroyCurrentGameTerminal() {
+        if (currentGameTerminal == null) {
+            return;
         }
+
+        currentGameTerminal.destroyTerminal();
+        panelGame.remove(currentGameTerminal.getBoard());
+        removeKeyListener(currentGameTerminal.getKeyListener());
+        removeFocusListener(currentGameTerminal.getFocusListener());
     }
 
-    private void setGameTerminal(GameTerminal gameTerminal) {
-        for (Component component : panelGame.getComponents()) {
-            panelGame.remove(component);
-        }
-        panelGame.add(gameTerminal);
-        /*
-         * Remove old listeners
-         */
-        for (KeyListener keyListener : getKeyListeners()) {
-            removeKeyListener(keyListener);
-        }
-
-        for (FocusListener focusListener : getFocusListeners()) {
-            removeFocusListener(focusListener);
-        }
-
-        /*
-         * Add new listeners
-         */
-        addKeyListener(gameTerminal.getKeyListener());
-        addFocusListener(gameTerminal.getFocusListener());
+    private void initCurrentGameTerminal() {
+        panelGame.add(currentGameTerminal.getBoard());
+        addKeyListener(currentGameTerminal.getKeyListener());
+        addFocusListener(currentGameTerminal.getFocusListener());
 
         requestFocusInWindow();
-        System.out.println("request");
 
         pack();
     }
@@ -299,7 +208,7 @@ public class MainFrame extends JFrame implements TerminalController {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                restartCurrentGame();
+                currentGameTerminal.startGame();
             }
         });
 
@@ -365,13 +274,6 @@ public class MainFrame extends JFrame implements TerminalController {
         return menuSettings;
     }
 
-    @Override
-    public void showMessage(String message) {
-        panelInfo.setMessage(message);
-        layout.show(getContentPane(), PANEL_INFO);
-    }
-
-    @Override
     public void showGameTerminal() {
         layout.show(getContentPane(), PANEL_GAME);
         restartCurrentGameMenu.setEnabled(true);

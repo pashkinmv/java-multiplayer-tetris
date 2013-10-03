@@ -23,50 +23,23 @@
 
 package ru.pashkin.jmt.view;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyListener;
-import javax.swing.Box;
-import javax.swing.JPanel;
-import ru.pashkin.jmt.controller.OnePlayerGameController;
-import ru.pashkin.jmt.controller.OnePlayerKeyListener;
 import ru.pashkin.jmt.model.TetrisModel;
 import ru.pashkin.jmt.view.components.DownShifter;
 import ru.pashkin.jmt.view.components.TetrisView;
 
-public class OnePlayerGameTerminal extends GameTerminal {
+import javax.swing.*;
+import java.awt.*;
 
-    private TetrisModel tetrisModel = new TetrisModel(10, 18, false);
+public class BoardOnePlayer extends JPanel {
+
+    private TetrisModel tetrisModel = new TetrisModel(10, 18);
     private TetrisView tetrisView = new TetrisView(tetrisModel);
     private DownShifter downShifter = new DownShifter(tetrisView);
-    private TetrisModel previewerModel = new TetrisModel(10, 4, false);
+    private TetrisModel previewerModel = new TetrisModel(10, 4);
     private TetrisView previewerView = new TetrisView(previewerModel);
     private final ScoresViewer scoresViewer = new ScoresViewer();
-    private OnePlayerGameController gameController =
-            new OnePlayerGameController(tetrisView, tetrisModel, downShifter, previewerView, previewerModel, scoresViewer);
-    private final KeyListener keyListener = new OnePlayerKeyListener(gameController);
-    private final FocusAdapter focusListener = new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-            gameController.pauseGame();
-        }
-    };
 
-    @Override
-    public KeyListener getKeyListener() {
-        return keyListener;
-    }
-
-    @Override
-    public FocusListener getFocusListener() {
-        return focusListener;
-    }
-
-    public OnePlayerGameTerminal() {
+    public BoardOnePlayer() {
         setLayout(new BorderLayout());
 
         initGui();
@@ -93,13 +66,31 @@ public class OnePlayerGameTerminal extends GameTerminal {
         add(wrapperPanel, BorderLayout.EAST);
     }
 
-    @Override
-    public void startGame() {
-        gameController.startGame();
+    public TetrisModel getTetrisModel() {
+        return tetrisModel;
     }
 
-    @Override
-    public void destroyTerminal() {
-        gameController.stopGameTimer();
+    public TetrisView getTetrisView() {
+        return tetrisView;
+    }
+
+    public DownShifter getDownShifter() {
+        return downShifter;
+    }
+
+    public TetrisModel getPreviewerModel() {
+        return previewerModel;
+    }
+
+    public TetrisView getPreviewerView() {
+        return previewerView;
+    }
+
+    public ScoresViewer getScoresViewer() {
+        return scoresViewer;
+    }
+
+    public void showMessage(String message) {
+        System.out.println(message);
     }
 }

@@ -21,29 +21,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class UpdatePlayer1PreviewerModelCommand extends AbstractCommand {
-    
-    private MultiplayerGameController multiplayerGameController;
-    
-    public UpdatePlayer1PreviewerModelCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "updatePlayer1PreviewerModel";
+public class StartGameCommand extends AbstractCommand {
+
+    public StartGameCommand(NetworkManager networkManager) {
+        super(StartGameCommand.class.getName(), networkManager);
+    }
+
+    @Override
+    protected void receiveData(String inputLine) {
+        if (!"do".equals(inputLine)) {
+            return;
+        }
         
-        this.multiplayerGameController = multiplayerGameController;
+        networkManager.getGameController().startGame();
     }
 
     @Override
-    protected void process(String inputLine) {
-        multiplayerGameController.getPlayer1PreviewerModel().fromString(inputLine);
-        multiplayerGameController.repaintPlayer1Previewer();
+    protected String sendData() {
+        return "do";
     }
-
-    @Override
-    protected String composeCommand() {
-        return multiplayerGameController.getPlayer1PreviewerModel().toString();
-    }
+    
 }

@@ -21,32 +21,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ru.pashkin.jmt.controller.multiplayercommands;
+package ru.pashkin.jmt.network.commands;
 
-import ru.pashkin.jmt.controller.MultiplayerGameController;
 import ru.pashkin.jmt.network.AbstractCommand;
+import ru.pashkin.jmt.network.NetworkManager;
 
-public class StartGameCommand extends AbstractCommand {
+public class ResumeGameCommand extends AbstractCommand {
 
-    private MultiplayerGameController multiplayerGameController;
-    
-    public StartGameCommand(MultiplayerGameController multiplayerGameController) {
-        commandName = "startGame";
-        
-        this.multiplayerGameController = multiplayerGameController;
+    public ResumeGameCommand(NetworkManager networkManager) {
+        super(ResumeGameCommand.class.getName(), networkManager);
     }
 
     @Override
-    protected void process(String inputLine) {
+    protected void receiveData(String inputLine) {
         if (!"do".equals(inputLine)) {
             return;
         }
         
-        multiplayerGameController.startGame();
+        networkManager.getGameController().resumeGame();
     }
 
     @Override
-    protected String composeCommand() {
+    protected String sendData() {
         return "do";
     }
     

@@ -33,21 +33,12 @@ public class TetrisModel {
     private String message;
     private int width;
     private int height;
-    /*
-     * true if the model supports two players
-     */
-    private boolean twoPlayerMode;
 
-    public TetrisModel(int width, int height, boolean twoPlayerMode) {
+    public TetrisModel(int width, int height) {
         this.width = width;
         this.height = height;
-        this.twoPlayerMode = twoPlayerMode;
-        
+
         clear();
-    }
-    
-    public boolean getTwoPlayerMode() {
-        return twoPlayerMode;
     }
     
     public AbstractFigure getFigure1() {
@@ -87,7 +78,7 @@ public class TetrisModel {
     }
 
     /**
-     * Removes fullfilled rows
+     * Removes fulfilled rows
      * @return Removed rows number
      */
     public int removeRows() {
